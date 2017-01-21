@@ -1,4 +1,8 @@
-clear = Proc.new {system "clear"}
+# This script is for the hacking minigame in the Fallout series.
+# Author: SecretKosmoNaut @ GitHub
+
+load "terminal.rb"
+include Terminal 
 
 def likeness(first, second)
 	likeness = 0
@@ -38,30 +42,30 @@ end
 
 
 # Prompt
-clear.call
-print "Enter all words separated by spaces: "
+clear_screen
+type_text("Enter all words separated by spaces: ", "print")
 
 $possible_passwords = gets.chomp.split
 
 
 # Main Loop
 while $possible_passwords.size > 1
-	clear.call
-	puts "Possible Passwords: #{$possible_passwords}"
+	clear_screen
+	type_text("Possible Passwords: #{$possible_passwords}", "puts")
 
-	print "Select a word: "
+	type_text("Select a word: ", "print")
 	choice = gets.chomp
 
 	if choice == "done"
 		exit(0)
 	end
 
-	print "Likeness: "
+	type_text("Likeness: ", "print")
 	likeness = gets.chomp.to_i
 
 	$possible_passwords = sift(choice, likeness, $possible_passwords)
-	clear.call
+	clear_screen
 end
 
 # Display answer
-puts "Success! Password: #{$possible_passwords}"
+type_text("Success! Password: #{$possible_passwords}", "puts")
