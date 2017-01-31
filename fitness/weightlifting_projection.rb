@@ -1,53 +1,76 @@
 total_weeks = 52
 current_week = 1
 
-exercise = ARGV[0].to_s
+exercise = ""
 
-weight_increment = 5.0
-starting_weight = ARGV[1].to_f
-current_weight = starting_weight
+weight_increment = 0
+starting_weight = 0
 
-workout_frequency = ARGV[2].to_f
-deload_frequency = 4
-deload_percent = 0.10
+workout_frequency = 0
+reset_frequency = 0
+reset_percent = 0
 
-def deload(weight, percent)
-	deload_amount = weight * percent
-	deload_amount = deload_amount.round
-
-	if deload_amount % 5 <= 2.5
-		deload_amount = (deload_amount / 5) * 5
+def clear_screen()
+	if /mswin|msys|mingw|cygwin|bccwin|wince|emc/ =~ RUBY_PLATFORM
+		system "cls"
 	else
-		deload_amount = ((deload_amount / 5) + 1) * 5
+		system "clear"
 	end
-
-	return deload_amount
 end
 
-workout = Proc.new {
-	puts "\t#{exercise.capitalize} 5 x #{current_weight.round}"
-	current_weight += weight_increment
+def reset(weight, percent)
+	reset_amount = weight * percent
+	reset_amount = reset_amount.round
+
+	if reset_amount % 5 <= 2.5
+		reset_amount = (reset_amount / 5) * 5
+	else
+		reset_amount = ((reset_amount / 5) + 1) * 5
+	end
+
+	return reset_amount
+end
+
+prompt = Proc.new {
+	clear_screen
+	print "Exercise: "
+	exercise = gets.chomp
+	clear_screen
+	print "Workout Frequency: "
+	workout_frequency = gets.chomp.to_f
+	clear_screen
+	print "Starting Weight: "
+	starting_weight = gets.chomp.to_f
+	clear_screen
+	print "Weight Increment: "
+	weight_increment = gets.chomp.to_f
+	clear_screen
+	print "Reset Frequency: "
+	reset_frequency = gets.chomp.to_f
+	clear_screen
+	print "Reset Percent: "
+	reset_percent = gets.chomp.to_f
+	clear_screen
 }
 
-until current_week > total_weeks
+workout = Proc.new {
+	puts "\t#{exercise.capitalize} 5 x #{starting_weight.round}"
+	starting_weight += weight_increment
+}
 
+prompt.call
+
+until current_week > total_weeks
 	puts "Week #{current_week}:"
 	workout_frequency.floor.times {workout.call}
 	
-	current_week += 1
-	
-	puts
-	
-	puts "Week #{current_week}:"
-	workout_frequency.round.times {workout.call}
-
-	if current_week % deload_frequency == 0
-		current_weight -= weight_increment
-		current_weight -= deload(current_weight, deload_percent)
-		puts "\tDeloading to #{current_weight.round}"
+	if current_week % reset_frequency == 0
+		starting_weight -= weight_increment
+		starting_weight -= reset(starting_weight, reset_percent)
+		puts "\tResetting to #{starting_weight.round}"
 	end
 
 	current_week += 1
-
+	
 	puts
 end
